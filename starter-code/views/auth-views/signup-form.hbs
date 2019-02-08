@@ -1,0 +1,14 @@
+<h2>Sign up form</h2>
+    {{>flashMessages}}
+<form action="/process-signUp" method="POST">
+    <label>
+        Your User Name (2characters or more):
+        <input type="text" name="userName" placeholder="User name" required/>
+    </label>
+    
+    <label>
+        Passeword (must contain a digit 0-9):
+        <input for="password" name="signUpPassword" placeholder="It's a secret" required>
+    </label>
+    <button>Sign UP</button>
+</form>

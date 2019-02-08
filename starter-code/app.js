@@ -8,6 +8,8 @@ const hbs          = require('hbs');
 const mongoose     = require('mongoose');
 const logger       = require('morgan');
 const path         = require('path');
+const session      = require('express-session');
+const flash        = require('connect-flash');
 
 
 mongoose
@@ -38,13 +40,33 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }));
       
+//connect the "views/partials/" folder to HBS for using partials
+hbs.registerPartials(path.join(__dirname, "views", "partials"));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
+//make our Expres app create sessions (moe on this tomorow)
+app.use(session({
+  // "saveUninitialized & resave are just to avoid "
+  saveUninitialized: true,
+  resave: true,
+  secret: "ca^khT8KYd,G73C7R9(;^atb?h>FTWdbn4pqEFUKs3",
+}));
+//allow our routes to use FLASH MESSAGES - Feedback messages before redirects
+//(flash messages need sessions to work)
+app.use(flash());
+app.use((req, res, next)=>{
+  // send flash messages to the hbs file
+  // (req.flash()comes from the "connect-flash" npm package)
+  res.locals.messages = req.flash();
 
+  //tel Express we are ready to move to the routes now
+  // (you need this or your pages will stat loading forever)
+  next();
+});
 
 // default value for title local
 app.locals.title = 'Express - Generated with IronGenerator';
@@ -54,5 +76,6 @@ app.locals.title = 'Express - Generated with IronGenerator';
 const index = require('./routes/index');
 app.use('/', index);
 
-
+const auth = require('./routes/auth-router.js');
+app.use('/', auth);
 module.exports = app;
